@@ -4,38 +4,38 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "hardware_interface/base_interface.hpp"
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
-#include "hardware_interface/types/hardware_interface_status_values.hpp"
+
 
 #include "config.h"
 #include "wheel.h"
 
-using hardware_interface::return_type;
 
-class FakeRobot : public hardware_interface::BaseInterface<hardware_interface::SystemInterface>
+using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+
+class FakeRobot : public hardware_interface::SystemInterface
 {
 
 
 public:
   FakeRobot();
 
-  return_type configure(const hardware_interface::HardwareInfo & info) override;
+  CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
 
   std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
 
   std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
-  return_type start() override;
+  CallbackReturn start() override;
 
-  return_type stop() override;
+  CallbackReturn stop() override;
 
-  return_type read() override;
+  CallbackReturn read() override;
 
-  return_type write() override;
+  CallbackReturn write() override;
 
 
 

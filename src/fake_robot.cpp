@@ -3,6 +3,7 @@
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 
+using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
 FakeRobot::FakeRobot()
   : logger_(rclcpp::get_logger("FakeRobot"))
@@ -10,10 +11,10 @@ FakeRobot::FakeRobot()
 
 
 
-return_type FakeRobot::configure(const hardware_interface::HardwareInfo & info)
+CallbackReturn FakeRobot::on_init(const hardware_interface::HardwareInfo & info)
 {
-  if (configure_default(info) != return_type::OK) {
-    return return_type::ERROR;
+  if (hardware_interface::SystemInterface::on_init(info) != CallbackReturn::SUCCESS) {
+        return CallbackReturn::ERROR;
   }
 
   RCLCPP_INFO(logger_, "Configuring...");
@@ -33,8 +34,7 @@ return_type FakeRobot::configure(const hardware_interface::HardwareInfo & info)
 
   RCLCPP_INFO(logger_, "Finished Configuration");
 
-  status_ = hardware_interface::status::CONFIGURED;
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 }
 
 std::vector<hardware_interface::StateInterface> FakeRobot::export_state_interfaces()
@@ -64,23 +64,21 @@ std::vector<hardware_interface::CommandInterface> FakeRobot::export_command_inte
 }
 
 
-return_type FakeRobot::start()
+CallbackReturn FakeRobot::start()
 {
   RCLCPP_INFO(logger_, "Starting Controller...");
-  status_ = hardware_interface::status::STARTED;
 
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 }
 
-return_type FakeRobot::stop()
+CallbackReturn FakeRobot::stop()
 {
   RCLCPP_INFO(logger_, "Stopping Controller...");
-  status_ = hardware_interface::status::STOPPED;
 
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type FakeRobot::read()
+CallbackReturn FakeRobot::read()
 {
 
   // TODO fix chrono duration
@@ -96,12 +94,12 @@ hardware_interface::return_type FakeRobot::read()
   l_wheel_.pos = l_wheel_.pos + l_wheel_.vel * deltaSeconds;
   r_wheel_.pos = r_wheel_.pos + r_wheel_.vel * deltaSeconds;
 
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 
   
 }
 
-hardware_interface::return_type FakeRobot::write()
+CallbackReturn FakeRobot::write()
 {
 
   // Set the wheel velocities to directly match what is commanded
@@ -110,7 +108,7 @@ hardware_interface::return_type FakeRobot::write()
   r_wheel_.vel = r_wheel_.cmd;
 
 
-  return return_type::OK;  
+  return CallbackReturn::SUCCESS;  
 }
 
 

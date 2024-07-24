@@ -4,7 +4,7 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 
 
-
+using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
 DiffDriveArduino::DiffDriveArduino()
     : logger_(rclcpp::get_logger("DiffDriveArduino"))
@@ -14,10 +14,10 @@ DiffDriveArduino::DiffDriveArduino()
 
 
 
-return_type DiffDriveArduino::configure(const hardware_interface::HardwareInfo & info)
+CallbackReturn DiffDriveArduino::on_init(const hardware_interface::HardwareInfo & info)
 {
-  if (configure_default(info) != return_type::OK) {
-    return return_type::ERROR;
+  if (hardware_interface::SystemInterface::on_init(info) != CallbackReturn::SUCCESS) {
+        return CallbackReturn::ERROR;
   }
 
   RCLCPP_INFO(logger_, "Configuring...");
@@ -41,8 +41,7 @@ return_type DiffDriveArduino::configure(const hardware_interface::HardwareInfo &
 
   RCLCPP_INFO(logger_, "Finished Configuration");
 
-  status_ = hardware_interface::status::CONFIGURED;
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 }
 
 std::vector<hardware_interface::StateInterface> DiffDriveArduino::export_state_interfaces()
@@ -72,7 +71,7 @@ std::vector<hardware_interface::CommandInterface> DiffDriveArduino::export_comma
 }
 
 
-return_type DiffDriveArduino::start()
+CallbackReturn DiffDriveArduino::start()
 {
   RCLCPP_INFO(logger_, "Starting Controller...");
 
@@ -81,20 +80,18 @@ return_type DiffDriveArduino::start()
   // arduino.setPidValues(14,7,0,100);
   arduino_.setPidValues(30, 20, 0, 100);
 
-  status_ = hardware_interface::status::STARTED;
 
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 }
 
-return_type DiffDriveArduino::stop()
+CallbackReturn DiffDriveArduino::stop()
 {
   RCLCPP_INFO(logger_, "Stopping Controller...");
-  status_ = hardware_interface::status::STOPPED;
 
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type DiffDriveArduino::read()
+CallbackReturn DiffDriveArduino::read()
 {
 
   // TODO fix chrono duration
@@ -108,7 +105,7 @@ hardware_interface::return_type DiffDriveArduino::read()
 
   if (!arduino_.connected())
   {
-    return return_type::ERROR;
+    return CallbackReturn::ERROR;
   }
 
   arduino_.readEncoderValues(l_wheel_.enc, r_wheel_.enc);
@@ -123,17 +120,17 @@ hardware_interface::return_type DiffDriveArduino::read()
 
 
 
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 
   
 }
 
-hardware_interface::return_type DiffDriveArduino::write()
+CallbackReturn DiffDriveArduino::write()
 {
 
   if (!arduino_.connected())
   {
-    return return_type::ERROR;
+    return CallbackReturn::ERROR;
   }
 
   arduino_.setMotorValues(l_wheel_.cmd / l_wheel_.rads_per_count / cfg_.loop_rate, r_wheel_.cmd / r_wheel_.rads_per_count / cfg_.loop_rate);
@@ -141,7 +138,7 @@ hardware_interface::return_type DiffDriveArduino::write()
 
 
 
-  return return_type::OK;
+  return CallbackReturn::SUCCESS;
 
 
   
